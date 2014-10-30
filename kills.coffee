@@ -68,7 +68,7 @@ module.exports = (robot) ->
   robot.hear /I hate (.*)/i, (msg) ->
     msg.send msg.random(insults) + " #{msg.match[1]}"
 
-  robot.hear /([A-Z]{4,})/, (msg) ->
+  robot.hear /[A-Z]{2,}[,.\-!\? ]?[A-Z]{3,} ?[^a-z]*/, (msg) ->
     msg.send "Did someone light a cyno?  All I see are caps everywhere."
 
   robot.hear /tired|too hard|to hard|upset|bored/i, (msg) ->
