@@ -71,10 +71,6 @@ module.exports = (robot) ->
     if (awake(robot)) 
      msg.send "Did someone light a cyno?  All I see are caps everywhere."
 
-  robot.hear /tired|too hard|to hard|upset|bored/i, (msg) ->
-    if (awake(robot)) 
-      msg.send "https://www.youtube.com/watch?v=S5xvkAPXB9c"
-
   robot.hear /doctrine/i, (msg) ->
     if (awake(robot)) 
       msg.emote "gasps and faints"
