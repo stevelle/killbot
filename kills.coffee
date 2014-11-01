@@ -2,7 +2,6 @@
 #
 # OscarRobo losses - Ask about recent losses by your corp
 # OscarRobo kills - Ask about recent kills by your corp
-# OscarRobo version - Ask Oscar about what version he is running
 # I hate <target> - Oscar will insult <target>
 # (and in random conversation) - Oscar will otherwise snark in channel, spam with image macros, and othwerwise be a twit until banned
 
@@ -58,9 +57,6 @@ module.exports = (robot) ->
       )()
   robot.hear /^kills$|^losses$/i, (msg) ->
     msg.send "you didn't say Simon Says!"
-
-  robot.respond /version/i, (msg) ->
-    msg.send "I'm running version #{version}"
 
   robot.hear /damn|fucking/i, (msg) ->
     msg.send msg.random schadenfreude
