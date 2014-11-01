@@ -56,37 +56,62 @@ module.exports = (robot) ->
                   "and there are #{parsedData.length - 1} other #{msg.match[1]} recently." 
       )()
   robot.hear /^kills$|^losses$/i, (msg) ->
-    msg.send "you didn't say Simon Says!"
+    if (awake(robot)) 
+      msg.send "you didn't say Simon Says!"
 
   robot.hear /damn|fucking/i, (msg) ->
-    msg.send msg.random schadenfreude
+    if (awake(robot)) 
+      msg.send msg.random schadenfreude
 
   robot.hear /I hate (.*)/i, (msg) ->
-    msg.send msg.random(insults) + " #{msg.match[1]}"
+    if (awake(robot)) 
+      msg.send msg.random(insults) + " #{msg.match[1]}"
 
   robot.hear /[A-Z]{2,}[,.\-!\? ]?[A-Z]{3,} ?[^a-z]*/, (msg) ->
-    msg.send "Did someone light a cyno?  All I see are caps everywhere."
+    if (awake(robot)) 
+     msg.send "Did someone light a cyno?  All I see are caps everywhere."
 
   robot.hear /tired|too hard|to hard|upset|bored/i, (msg) ->
-    msg.send "https://www.youtube.com/watch?v=S5xvkAPXB9c"
+    if (awake(robot)) 
+      msg.send "https://www.youtube.com/watch?v=S5xvkAPXB9c"
 
   robot.hear /doctrine/i, (msg) ->
-    msg.emote "gasps and faints"
+    if (awake(robot)) 
+      msg.emote "gasps and faints"
 
   robot.hear /blue funnelcake/i, (msg) ->
-    msg.send "Yeah, fuck those guys.  Rabble rabble."
+    if (awake(robot)) 
+      msg.send "Yeah, fuck those guys.  Rabble rabble."
 
   robot.hear /^wb [a-z]+|welcome back/i, (msg) ->
-    msg.send "http://imagemacros.files.wordpress.com/2009/06/clowntrain.jpeg"
+    if (awake(robot)) 
+      msg.send "http://imagemacros.files.wordpress.com/2009/06/clowntrain.jpeg"
 
   robot.hear /failed|derped/i, (msg) ->
-    msg.send "http://imagemacros.files.wordpress.com/2011/11/nice_glass_derp.jpg"
+    if (awake(robot)) 
+      msg.send "http://imagemacros.files.wordpress.com/2011/11/nice_glass_derp.jpg"
 
   robot.hear /is down/, (msg) ->
-    msg.send "http://imagemacros.files.wordpress.com/2010/02/roger_american_dad_technical_problems.png"
+    if (awake(robot)) 
+      msg.send "http://imagemacros.files.wordpress.com/2010/02/roger_american_dad_technical_problems.png"
+
+  robot.respond /stfu|shut up|mute/i, (msg) ->
+    now = new Date
+    wake = now.setMinutes(now.getMinutes + 15)
+    robot.brain.set 'sleepUntil', wake
+    msg.send "Do you want me to sit in a corner and rust or just fall apart where I'm standing?"
 
   robot.error (err, msg) ->
     robot.logger.error "BARF! #{err}"
+
+#semi-mute
+#if (msg.random([0..10]) < 3)
+
+awake = (robot) ->
+  wake = robot.brain.get 'sleepUntil' 
+  if wake?
+    return wake >= new Date
+  return true
 
 # Debugging Aids
 cache = [] 
