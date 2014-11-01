@@ -76,7 +76,7 @@ module.exports = (robot) ->
   robot.hear /blue funnelcake/i, (msg) ->
     msg.send "Yeah, fuck those guys.  Rabble rabble."
 
-  robot.hear /wb|welcome back/i, (msg) ->
+  robot.hear /^wb [a-z]+|welcome back/i, (msg) ->
     msg.send "http://imagemacros.files.wordpress.com/2009/06/clowntrain.jpeg"
 
   robot.hear /failed|derped/i, (msg) ->
