@@ -13,9 +13,11 @@ email = process.env.HUBOT_OPERATOR_EMAIL
 version = "0.0.2"
 
 #   depends on xml2json - so `npm install xml2json` already
+#   depends on moment - so `npm install moment` already
 #   also depends on zlip
 parser = require('xml2json')
 zlib = require('zlib')
+moment = require('moment')
 
 module.exports = (robot) ->
   robot.respond /(kills|losses)/i, (msg) ->
@@ -92,8 +94,7 @@ module.exports = (robot) ->
       msg.send "http://imagemacros.files.wordpress.com/2010/02/roger_american_dad_technical_problems.png"
 
   robot.respond /stfu|shut up|mute/i, (msg) ->
-    now = new Date
-    wake = now.setMinutes(now.getMinutes + 15)
+    wake = moment().add(15, 'm')
     robot.brain.set 'sleepUntil', wake
     msg.send "Do you want me to sit in a corner and rust or just fall apart where I'm standing?"
 
@@ -106,7 +107,7 @@ module.exports = (robot) ->
 awake = (robot) ->
   wake = robot.brain.get 'sleepUntil' 
   if wake?
-    return wake >= new Date
+    return wake <= moment()
   return true
 
 # Debugging Aids
