@@ -3,6 +3,7 @@
 # OscarRobo losses - Ask about recent losses by your corp
 # OscarRobo kills - Ask about recent kills by your corp
 # OscarRobo sleep - Mute OscarRobo's snark for 15 minutes
+# OscarRobo wake - Unmute OscarRobo's snark
 # I hate <target> - Oscar will insult <target>
 # ...(and in random conversation) - Oscar will otherwise snark in channel, spam with image macros, and othwerwise be a twit until muted
 
@@ -98,6 +99,10 @@ module.exports = (robot) ->
     wake = moment().add(15, 'm')
     robot.brain.set 'sleepUntil', wake
     msg.send "Do you want me to sit in a corner and rust or just fall apart where I'm standing?"
+
+  robot.respond /wake|rise and shine|unmute/i, (msg) ->
+    robot.brain.set 'sleepUntil', moment()
+    msg.send "This will all end in tears."
 
   robot.error (err, msg) ->
     robot.logger.error "BARF! #{err}"
