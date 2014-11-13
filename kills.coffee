@@ -2,8 +2,9 @@
 #
 # OscarRobo losses - Ask about recent losses by your corp
 # OscarRobo kills - Ask about recent kills by your corp
+# OscarRobo sleep - Mute OscarRobo's snark for 15 minutes
 # I hate <target> - Oscar will insult <target>
-# (and in random conversation) - Oscar will otherwise snark in channel, spam with image macros, and othwerwise be a twit until banned
+# ...(and in random conversation) - Oscar will otherwise snark in channel, spam with image macros, and othwerwise be a twit until muted
 
 # Must Set HUBOT_CORP_ID environment var in hubot's ENV
 # Must Set HUBOT_OPERATOR_EMAIL environment var as well
@@ -93,7 +94,7 @@ module.exports = (robot) ->
     if (awake(robot)) 
       msg.send "http://imagemacros.files.wordpress.com/2010/02/roger_american_dad_technical_problems.png"
 
-  robot.respond /stfu|shut up|mute/i, (msg) ->
+  robot.respond /stfu|shut up|mute|sleep/i, (msg) ->
     wake = moment().add(15, 'm')
     robot.brain.set 'sleepUntil', wake
     msg.send "Do you want me to sit in a corner and rust or just fall apart where I'm standing?"
