@@ -63,6 +63,10 @@ module.exports = (robot) ->
     if (awake(robot)) 
       msg.send msg.random schadenfreude
 
+  robot.hear /inspire|inspiration/i, (msg) ->
+    if (awake(robot))
+      msg.send "Your wish is my command! " + msg.random(inspirations)
+
   robot.hear /I hate (.*)/i, (msg) ->
     if (awake(robot)) 
       msg.send "Yeah. I do too."
@@ -152,6 +156,11 @@ schadenfreude = [
   "Your delicious tears sustain me.",
   "Can I have your stuff?",
   "Someone needs a hug."
+]
+
+inspirations = [
+  "https://www.youtube.com/watch?v=1AQ6gQSoIrQ",
+  "https://www.youtube.com/watch?v=AdfFnTt2UT0",
 ]
 
 insults = [
