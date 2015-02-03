@@ -1,7 +1,7 @@
 # OscarRobo will fill the world with bad attitude.
 #
-# OscarRobo losses - Ask about recent losses by your corp
-# OscarRobo kills - Ask about recent kills by your corp
+# !losses - Ask about recent losses by your corp
+# !kills - Ask about recent kills by your corp
 # OscarRobo sleep - Mute OscarRobo's snark for 15 minutes
 # OscarRobo wake - Unmute OscarRobo's snark
 # I hate <target> - Oscar will insult <target>
@@ -12,7 +12,7 @@
 # TODO ensure these are set
 corp_id = process.env.HUBOT_CORP_ID
 email = process.env.HUBOT_OPERATOR_EMAIL
-version = "0.0.2"
+version = "0.0.3"
 
 #   depends on xml2json - so `npm install xml2json` already
 #   depends on moment - so `npm install moment` already
@@ -20,17 +20,21 @@ version = "0.0.2"
 parser = require('xml2json')
 zlib = require('zlib')
 moment = require('moment')
+Util = require('util')
 
 module.exports = (robot) ->
-  robot.respond /(kills|losses)/i, (msg) ->
+  robot.hear /^!(kills|losses) in ([0-9]+) ([a-zA-Z]+)/i, (msg) ->
     if !corp_id?
       msg.send "I can't do that. Someone forgot to tell me the corporation ID you care about."
       return
     
     msg.send "Give me a moment..."
     data = ""
-    # TODO Number of hours should be from ENV
-    msg.http("https://zkillboard.com/api/#{msg.match[1]}/corporationID/#{corp_id}/pastSeconds/108000/")
+    window = msg.match[2]
+    unit = msg.match[3].toLowerCase()
+    # TODO corp ID from brain by ticker
+    from_time = moment().utc().subtract(window, unit).format("YYYYMMDDHHmmss")
+    msg.http("https://beta.eve-kill.net/api/#{msg.match[1]}/corporationID/#{corp_id}/startTime/#{from_time}/")
       .headers('Accept': 'application/json', 'Accept-Encoding': 'gzip', 'User-Agent': "OscarRobo/#{version} [#{email}] (on Hubot/2.9.0)")
       .get( (err, req) ->
         req.addListener "response", (res)->
@@ -44,26 +48,18 @@ module.exports = (robot) ->
             parsedData = JSON.parse(data)
             if parsedData.error
               robot.emit 'error', parsedData.error.message
+              msg.send parsedData.error.message
               return
 
             if (parsedData.length == 0)
               msg.send "Nothing showing recently."
               return
             
-            robot.http("https://api.eveonline.com/Eve/TypeName.xml.aspx?ids=#{parsedData[0].victim.shipTypeID}")
-              .get() (err2, res2, xml) ->
-                if res2.statusCode isnt 200 or err2
-                  robot.emit 'error', err2, res2
-                  return
-                ship = JSON.parse(parser.toJson(xml)).eveapi.result.rowset.row.typeName
-                msg.send "#{parsedData[0].victim.characterName} died last in a #{ship} " +
-                  "and there are #{parsedData.length - 1} other #{msg.match[1]} recently." 
+            for idx in [0..parsedData.length-1]
+              report_kill(robot, msg, parsedData[idx])
       )()
-  robot.hear /^kills$|^losses$/i, (msg) ->
-    if (awake(robot)) 
-      msg.send "you didn't say Simon Says!"
 
-  robot.hear /damn|fucking/i, (msg) ->
+  robot.hear /damn |fucking /i, (msg) ->
     if (awake(robot)) 
       msg.send msg.random schadenfreude
 
@@ -95,7 +91,7 @@ module.exports = (robot) ->
     if (awake(robot)) 
       msg.send "http://imagemacros.files.wordpress.com/2010/02/roger_american_dad_technical_problems.png"
 
-  robot.respond /stfu|shut up|mute|sleep/i, (msg) ->
+  robot.respond /stfu|shut up|mute|sleep|diaf/i, (msg) ->
     wake = moment().add(15, 'm')
     robot.brain.set 'sleepUntil', wake
     msg.send "Do you want me to sit in a corner and rust or just fall apart where I'm standing?"
@@ -109,6 +105,24 @@ module.exports = (robot) ->
 
 #semi-mute
 #if (msg.random([0..10]) < 3)
+
+report_kill = (robot, msg, kill) ->
+  name_for_id(robot, msg, kill.victim.shipTypeID, (msg, ship) ->
+    msg.send "#{kill.victim.characterName} died last in a #{ship}" # + " https://beta.eve-kill.net/kill/#{kill.killID}" 
+  )
+
+name_for_id = (robot, msg, id, callback) ->
+  name = robot.brain.get "itemID.#{id}"
+  if name?
+    callback(msg, name)
+  else
+    msg.http("https://api.eveonline.com/Eve/TypeName.xml.aspx?ids=#{id}")
+      .get() (err2, res2, xml) ->
+        if res2.statusCode isnt 200 or err2
+          return '<unknown: #{id}>'
+        tree = JSON.parse(parser.toJson(xml))
+        robot.brain.set "itemID.#{id}", tree.eveapi.result.rowset.row.typeName
+        callback(msg, tree.eveapi.result.rowset.row.typeName)
 
 awake = (robot) ->
   wake = robot.brain.get 'sleepUntil' 
