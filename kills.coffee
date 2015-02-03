@@ -65,25 +65,33 @@ module.exports = (robot) ->
 
   robot.hear /I hate (.*)/i, (msg) ->
     if (awake(robot)) 
-      msg.send msg.random(insults) + " #{msg.match[1]}"
+      msg.send "Yeah. I do too."
+      #msg.send msg.random(insults) + " #{msg.match[1]}"
 
-  robot.hear /[A-Z]{2,}[,.\-!\? ]?[A-Z]{3,} ?[^a-z]*/, (msg) ->
+  robot.hear /[A-Z]{3,}[,.\-!\? ]?[A-Z]{4,} ?[^a-z]*/, (msg) ->
     if (awake(robot)) 
-     msg.send "Did someone light a cyno?  All I see are caps everywhere."
+      for key in ['http', 'WHAPP', 'ADHC', 'CYNOU', 'TISHU', 'youtu']
+        if msg.message.text.indexOf(key) > -1
+          return
+      msg.send "Did someone light a cyno?  All I see are caps everywhere."
 
   robot.hear /doctrine/i, (msg) ->
     if (awake(robot)) 
       msg.emote "gasps and faints"
 
-  robot.hear /blue funnelcake/i, (msg) ->
+  robot.hear /blue funnelcake|got blobbed|by blobbers/i, (msg) ->
     if (awake(robot)) 
-      msg.send "Yeah, fuck those guys.  Rabble rabble."
+      msg.send "Yeah, fuck those guys. Rabble rabble."
+
+  robot.hear /bringin[g]? solo back/i, (msg) ->
+    if (awake(robot))
+      msg.send "My hero. https://pbs.twimg.com/profile_images/464717630968848385/Ji9pV1Ai_200x200.jpeg"
 
   robot.hear /^wb [a-z]+|^wb$|welcome back/i, (msg) ->
     if (awake(robot)) 
       msg.send "http://imagemacros.files.wordpress.com/2009/06/clowntrain.jpeg"
 
-  robot.hear /failed|derped/i, (msg) ->
+  robot.hear /failed [^over]|derped/i, (msg) ->
     if (awake(robot)) 
       msg.send "http://imagemacros.files.wordpress.com/2011/11/nice_glass_derp.jpg"
 
